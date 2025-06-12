@@ -11,7 +11,7 @@ public class StateMachine<T>
    {
         _owner = owner;
    }
-   public void ChangeState(State<T> newState)//但切换到其他状态时会触发先退出当前状态在切换到其他状态
+   public void ChangeState(State<T> newState)
    {
         CurrenState?.Exit();
         CurrenState = newState;

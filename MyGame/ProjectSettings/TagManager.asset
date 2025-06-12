@@ -13,11 +13,11 @@ TagManager:
   - Water
   - UI
   - Obstacles
-  - VisionSersor
   - Player
   - Enemy
-  - PlayerHitbox
+  - PlayHitbox
   - EnemyHitbox
+  - VisionSensor
   - 
   - 
   - 

@@ -36,14 +36,17 @@ public class EnemyController : MonoBehaviour
 
         stateMachine.ChangeState(stateDict[states]);
     }
+    Vector3 prevPos;
     private void Update()//任务的开始
     {
-        //var currentState = stateMachine.CurrenState;
-        //if (currentState is CombatMovementState)
-        //{
-        //    Debug.Log("当前状态：ChaseState");
-        //}
         stateMachine.Execute();
-        Animator.SetFloat("moveAmount", NavAgent.velocity.magnitude / NavAgent.speed);
+        var deltaPos = transform.position - prevPos;
+        var velocity = deltaPos / Time.deltaTime;
+        float forwardSpeed = Vector3.Dot(velocity,transform.forward);
+        Animator.SetFloat("moveAmount", forwardSpeed / NavAgent.speed,0.2f,Time.deltaTime);
+        float angle = Vector3.SignedAngle(transform.forward,velocity,Vector3.up);
+        float strafeSpeed = Mathf.Sin(angle*Mathf.Deg2Rad);
+        Animator.SetFloat("strafeSpeed", strafeSpeed,0.2f,Time.deltaTime);
+        prevPos = transform.position;  
     }
 }

@@ -6,7 +6,7 @@ public class VisionSensor : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] EnemyController enemy;
-    private void OnTriggerEnter(Collider other)//自动触发，敌人自动添加主角信息
+    private void OnTriggerEnter(Collider other)
     {
         var fighter = other.GetComponent<MeleeFighter>();
         if(fighter!=null)
