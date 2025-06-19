@@ -11,4 +11,4 @@ public class AttackData : ScriptableObject//***
 
 
 }
-public enum AttackHitbox {RightFoot,LeftHand }
+public enum AttackHitbox {RightFoot,LeftHand,RightHand }

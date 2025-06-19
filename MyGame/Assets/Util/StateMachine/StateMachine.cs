@@ -11,7 +11,7 @@ public class StateMachine<T>
    {
         _owner = owner;
    }
-   public void ChangeState(State<T> newState)
+   public void ChangeState(State<T> newState)//一使用这个就会先用Enter然后Enter里面
    {
         CurrenState?.Exit();
         CurrenState = newState;

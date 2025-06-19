@@ -12,7 +12,7 @@ public class CombatController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void Update()//主角攻击的主入口
     {
         if (Input.GetButtonDown("Attack"))
         {

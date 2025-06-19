@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //攻击动画
-public enum AttackState {Idle,Windup,Inpact,Cooldown };//攻击的状态，只有使出挥剑的动作才能有被攻击的状态
+public enum AttackStates {Idle,Windup,Inpact,Cooldown };//攻击的状态，只有使出挥剑的动作才能有被攻击的状态
 public class MeleeFighter : MonoBehaviour
 {
     int doCombCount = 0;
@@ -22,11 +22,15 @@ public class MeleeFighter : MonoBehaviour
         {
             swordCollider = sword.GetComponent<BoxCollider>();
             rightFootCollide = animator.GetBoneTransform(HumanBodyBones.RightFoot).GetComponent<SphereCollider>();
+         
             swordCollider.enabled = false;
-            rightFootCollide.enabled = false;
+            if (rightFootCollide != null)
+            {
+                rightFootCollide.enabled = false;
+            }
         }
     }
-    public AttackState attackState; 
+    public AttackStates attackStates { get; private set; } 
     public bool inAction { get; private set; } = false;
     bool doComb;
     
@@ -41,7 +45,7 @@ public class MeleeFighter : MonoBehaviour
         //当按下第一次攻击时，进入if，然后进入协程 inAction变为true，在第一次动画中再次按下攻击，因为协程还没有结束，
         //inAction一直是true，不进入if，但是协程中攻击状态（attackState）已经改变所有进入else if docomb变成true协程中触发连击
         //总的来说就是相当于只有在攻击的后半段在按攻击才能进入连击
-        else if (attackState == AttackState.Cooldown|| attackState == AttackState.Inpact)
+        else if (attackStates == AttackStates.Cooldown|| attackStates == AttackStates.Inpact)
         {
             doComb = true;
         }
@@ -52,7 +56,7 @@ public class MeleeFighter : MonoBehaviour
 
         Debug.Log(doCombCount);
         inAction = true;// 标记攻击开始
-        attackState = AttackState.Windup;
+        attackStates = AttackStates.Windup;
         //float impactStartTime = 0.33f;//选择攻击动画中造成伤害的时间点（就是挥出去那一段造成伤害时间段记下来）
         //float impactEndTime = 0.55f;
 
@@ -67,26 +71,32 @@ public class MeleeFighter : MonoBehaviour
         {
             timer += Time.deltaTime;//计算时间
             float normalizedTime = timer / animState.length;//统一化
-            if (attackState == AttackState.Windup)
+            if (attackStates == AttackStates.Windup)
             {
                 if (normalizedTime >= attacks[doCombCount].ImpactStartime)
                 {
-                    attackState = AttackState.Inpact;
+                    attackStates = AttackStates.Inpact;
                     swordCollider.enabled = true;
-                    rightFootCollide.enabled = true;
+                    if (rightFootCollide != null)
+                    {
+                        rightFootCollide.enabled = true;
+                    }
                 }
                 
             }
-            else if (attackState == AttackState.Inpact)
+            else if (attackStates == AttackStates.Inpact)
             {
                 if (normalizedTime >= attacks[doCombCount].ImpactEndtime)
                 {
-                    attackState = AttackState.Cooldown;
+                    attackStates = AttackStates.Cooldown;
                     swordCollider.enabled = false;
-                    rightFootCollide.enabled = false;
+                    if (rightFootCollide != null)
+                    {
+                        rightFootCollide.enabled = false;
+                    }
                 }
             }
-            else if (attackState == AttackState.Cooldown)
+            else if (attackStates == AttackStates.Cooldown)
             {
                 if(doComb)
                 {
@@ -100,7 +110,7 @@ public class MeleeFighter : MonoBehaviour
 
             yield return null;//等待一帧在这个循环中就是等待直到这个动画结束
         }
-        attackState = AttackState.Idle;
+        attackStates = AttackStates.Idle;
         doCombCount = 0;
         inAction = false;
 
