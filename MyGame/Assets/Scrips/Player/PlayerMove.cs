@@ -33,7 +33,7 @@ public class PlayMove : MonoBehaviour
        
         if (meleeFighter.inAction)//确保我们按下攻击键不会移动
         {
-            animator.SetFloat("moveAmount", 0f);//确保攻击停止时不会是跑或者走的状态   
+            animator.SetFloat("forwardSpeed", 0f);//确保攻击停止时不会是跑或者走的状态   
             return; 
         }
         // 使用原始输入，立即获取0值
@@ -48,6 +48,7 @@ public class PlayMove : MonoBehaviour
 
         if (isGrounded)//看是否在地面上还是在空中,来判断是否增加重力
         {
+           
             ySpeed = -0.5f;
         }
         else
@@ -56,7 +57,7 @@ public class PlayMove : MonoBehaviour
         }
         var velocity = moveDir * movespeed;
         velocity.y = ySpeed;
-        characterController.Move(velocity * Time.deltaTime);//有重力有碰撞人物移动的距离
+        characterController.Move(velocity * Time.deltaTime);//有重力有碰撞人物在空中移动的距离
         if (moveAmount > 0)//当视角移动量大于0时人物才能移动
         {
             targetRotation = Quaternion.LookRotation(moveDir);
@@ -65,7 +66,7 @@ public class PlayMove : MonoBehaviour
         }
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);//人物移动的方向
-        animator.SetFloat("moveAmount", moveAmount, 0.2f, Time.deltaTime);//播放走和跑的动画，并且是逐步的播放
+        animator.SetFloat("forwardSpeed", moveAmount, 0.2f, Time.deltaTime);//播放走和跑的动画，并且是逐步的播放
     }
     
     //检测是否与地面接触，这个物体没有显示出来

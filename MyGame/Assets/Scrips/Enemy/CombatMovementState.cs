@@ -30,7 +30,7 @@ public class CombatMovementState : State<EnemyController>
 
         if (Vector3.Distance(enemy.transform.position, enemy.Target.transform.position) > distanceToStand + adjust)
         {
-            Debug.Log(4);
+           
             StartChase();
         }
         if (state == AICombatState.Idle)
@@ -79,17 +79,17 @@ public class CombatMovementState : State<EnemyController>
     }
     void StartChase()
     {
-        Debug.Log(5);
+       
         state = AICombatState.Chase;
         enemy.Animator.SetBool("CombatMode",false);
-        enemy.Animator.SetBool("circling", false);
+      
     }
     void StartIdle()
     {
         state = AICombatState.Idle;
         timer = UnityEngine.Random.Range(idleTimeRange.x,idleTimeRange.y);
         enemy.Animator.SetBool("CombatMode", true);
-        enemy.Animator.SetBool("circling", false);
+    
 
     }
     void StartCircling()
@@ -98,8 +98,7 @@ public class CombatMovementState : State<EnemyController>
         state = AICombatState.Circling;
         timer = Random.Range(circlingTimeRange.x, circlingTimeRange.y);
         circlingDir = Random.Range(0, 2) == 0 ? 1 : -1;
-        enemy.Animator.SetBool("circling", true);    
-        enemy.Animator.SetFloat("circlingDir", circlingDir);    
+     
 
     }
     public override void Exit()

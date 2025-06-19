@@ -39,14 +39,19 @@ public class EnemyController : MonoBehaviour
     Vector3 prevPos;
     private void Update()//任务的开始
     {
-        stateMachine.Execute();
         var deltaPos = transform.position - prevPos;
         var velocity = deltaPos / Time.deltaTime;
-        float forwardSpeed = Vector3.Dot(velocity,transform.forward);
-        Animator.SetFloat("moveAmount", forwardSpeed / NavAgent.speed,0.2f,Time.deltaTime);
+        float forwardSpeed = Vector3.Dot(velocity, transform.forward);
+        Animator.SetFloat("forwardSpeed", forwardSpeed / NavAgent.speed, 0.2f, Time.deltaTime);
+ 
+        
+       
+        
         float angle = Vector3.SignedAngle(transform.forward,velocity,Vector3.up);
         float strafeSpeed = Mathf.Sin(angle*Mathf.Deg2Rad);
-        Animator.SetFloat("strafeSpeed", strafeSpeed,0.2f,Time.deltaTime);
-        prevPos = transform.position;  
+        Animator.SetFloat("strafeSpeed", strafeSpeed, 0.2f,Time.deltaTime);
+        Debug.Log("forwardSpeed=" + forwardSpeed + " strafeSpeed=" + strafeSpeed);
+        prevPos = transform.position;
+        stateMachine.Execute();
     }
 }

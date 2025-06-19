@@ -139,7 +139,7 @@ public class MeleeFighter : MonoBehaviour
 
 
         var animState = animator.GetNextAnimatorStateInfo(1);
-        yield return new WaitForSeconds(animState.length*0.2f);
+        yield return new WaitForSeconds(animState.length*0.5f);
         inAction = false;
 
     }
