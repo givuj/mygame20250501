@@ -2429,6 +2429,7 @@ MonoBehaviour:
   attacks:
   - {fileID: 11400000, guid: 9f64ddd6ffcc13e45982be10bb6e63c3, type: 2}
   - {fileID: 11400000, guid: 55a1f80b32895ce48993410d6f9923c5, type: 2}
+  - {fileID: 11400000, guid: 05307dc968e7f2549a98b7922a28f3f7, type: 2}
   sword: {fileID: 4314162749728816677}
 --- !u!143 &6431396031920238744
 CharacterController:

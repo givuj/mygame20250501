@@ -25,7 +25,7 @@ public class AttackState : State<EnemyController>
         if (Vector3.Distance(enemy.transform.position, enemy.Target.transform.position) <= attackDistance + 0.03f)
         {
             Debug.Log("尝试启动攻击协程");
-            StartCoroutine(Attack(Random.Range(0,4)));
+            StartCoroutine(Attack(Random.Range(1,6)));
         }
            
     }
@@ -34,9 +34,11 @@ public class AttackState : State<EnemyController>
         isAttacking = true;//因为update是每帧都调用
         enemy.Animator.applyRootMotion = true;
         enemy.Fighter.TryToAttack();
-        for(int i=1;i<combCount ;i++)
+        for(int i=1;i<combCount ;i++)//连击此时，当combCount为3时，实施2次连击，相当于两次把doComb变为true可以执行两次
+                                     //MeleeFighter中if(doComb)这个语句
+      
         {
-            yield return new WaitUntil(() => enemy.Fighter.attackStates == AttackStates.Cooldown);//这个不是等待语句这个是检测语句，只有满足条件才会执行下一个
+            yield return new WaitUntil(() => enemy.Fighter.attackStates == AttackStates.Cooldown);//这个不是等待语句这个是检测语句
                                                                                                   //等待是yield return new WaitForSeconds 这个        
             enemy.Fighter.TryToAttack();
         }
