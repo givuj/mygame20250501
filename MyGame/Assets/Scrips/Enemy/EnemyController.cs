@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-public enum EnemyStates { Idle, CombatMovement,Attack}
+public enum EnemyStates { Idle, CombatMovement,Attack,RetreatAfterAttack}
 public class EnemyController : MonoBehaviour
 {
     public List<MeleeFighter> TargetsInRange { get; set; } = new List<MeleeFighter>();//主角数量
@@ -22,6 +22,7 @@ public class EnemyController : MonoBehaviour
         stateDict[EnemyStates.Idle] = GetComponent<IdleState>();
         stateDict[EnemyStates.CombatMovement] = GetComponent<CombatMovementState>();
         stateDict[EnemyStates.Attack] = GetComponent<AttackState>();
+        stateDict[EnemyStates.RetreatAfterAttack] = GetComponent<RetreatAfterAttactState>();
         stateMachine = new StateMachine<EnemyController>(this);//注意没有获取StateMachine<EnemyController>的对象
                                                                //获取敌人放入状态机中，
                                                                //敌人通过VisionSensor获取了主角信息
@@ -48,7 +49,8 @@ public class EnemyController : MonoBehaviour
     Vector3 prevPos;
     private void Update()//人物移动和敌人追逐的主入口，以及人物攻击Execute的入口
     {
-        var deltaPos = transform.position - prevPos;
+        stateMachine.Execute();
+        var deltaPos = Animator.applyRootMotion?Vector3.zero: transform.position - prevPos;
         var velocity = deltaPos / Time.deltaTime;
         float forwardSpeed = Vector3.Dot(velocity, transform.forward);
         Animator.SetFloat("forwardSpeed", forwardSpeed / NavAgent.speed, 0.2f, Time.deltaTime);
@@ -59,8 +61,9 @@ public class EnemyController : MonoBehaviour
         float angle = Vector3.SignedAngle(transform.forward,velocity,Vector3.up);
         float strafeSpeed = Mathf.Sin(angle*Mathf.Deg2Rad);
         Animator.SetFloat("strafeSpeed", strafeSpeed, 0.2f,Time.deltaTime);
-      
+        
         prevPos = transform.position;
-        stateMachine.Execute();
+     
+        
     }
 }

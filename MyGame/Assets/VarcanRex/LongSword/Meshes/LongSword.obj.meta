@@ -3,7 +3,12 @@ guid: 9c9f65c1284b22247bafd1ebc8dbb632
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LongSwordMeshMat
+    second: {fileID: 2100000, guid: 858789d7a5a49074f94eed8d79dd443d, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
