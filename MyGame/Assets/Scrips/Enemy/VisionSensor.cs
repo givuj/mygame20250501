@@ -6,6 +6,10 @@ public class VisionSensor : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] EnemyController enemy;
+    private void Awake()
+    {
+        enemy.visionSensor = this;
+    }
     private void OnTriggerEnter(Collider other)
     {
         var fighter = other.GetComponent<MeleeFighter>();

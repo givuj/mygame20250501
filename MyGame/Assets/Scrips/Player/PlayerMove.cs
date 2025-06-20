@@ -33,6 +33,7 @@ public class PlayMove : MonoBehaviour
        
         if (meleeFighter.inAction)//确保我们按下攻击键不会移动
         {
+            targetRotation = transform.rotation;//反击后玩家的视角不会再转动
             animator.SetFloat("forwardSpeed", 0f);//确保攻击停止时不会是跑或者走的状态   
             return; 
         }

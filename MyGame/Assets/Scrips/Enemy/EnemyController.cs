@@ -2,27 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-public enum EnemyStates { Idle, CombatMovement,Attack,RetreatAfterAttack}
+public enum EnemyStates { Idle, CombatMovement,Attack,RetreatAfterAttack,Dead}
 public class EnemyController : MonoBehaviour
 {
     public List<MeleeFighter> TargetsInRange { get; set; } = new List<MeleeFighter>();//主角数量
     [field: SerializeField] public float Fov { get; private set; } = 180f;//
     public MeleeFighter Target { get; set; }
     public NavMeshAgent NavAgent { get; private set; }
+    public CharacterController CharacterController { get; private set; }
     public StateMachine<EnemyController> stateMachine { get; private set; }
     public float CombatMovementTimer { get; set; } = 0f;
     public Animator Animator { get; private set; }
     public MeleeFighter Fighter { get; private set; }
+    public VisionSensor visionSensor { get;  set; }
 
     Dictionary<EnemyStates, State<EnemyController>> stateDict;
     private void Start()
     {
         NavAgent = GetComponent<NavMeshAgent>();
+        CharacterController = GetComponent<CharacterController>();
         stateDict = new Dictionary<EnemyStates, State<EnemyController>>();
         stateDict[EnemyStates.Idle] = GetComponent<IdleState>();
         stateDict[EnemyStates.CombatMovement] = GetComponent<CombatMovementState>();
         stateDict[EnemyStates.Attack] = GetComponent<AttackState>();
         stateDict[EnemyStates.RetreatAfterAttack] = GetComponent<RetreatAfterAttactState>();
+        stateDict[EnemyStates.Dead] = GetComponent<DeadState>();
         stateMachine = new StateMachine<EnemyController>(this);//注意没有获取StateMachine<EnemyController>的对象
                                                                //获取敌人放入状态机中，
                                                                //敌人通过VisionSensor获取了主角信息

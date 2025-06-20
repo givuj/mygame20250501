@@ -24,7 +24,7 @@ public class AttackState : State<EnemyController>
         enemy.NavAgent.SetDestination(enemy.Target.transform.position);
         if (Vector3.Distance(enemy.transform.position, enemy.Target.transform.position) <= attackDistance + 0.03f)
         {
-            Debug.Log("尝试启动攻击协程");
+            
             StartCoroutine(Attack(Random.Range(1,6)));
         }
            
@@ -45,6 +45,7 @@ public class AttackState : State<EnemyController>
         yield return new WaitUntil(() => enemy.Fighter.attackStates == AttackStates.Idle);//可以去看MeleeFighter中的TryToAttack
         enemy.Animator.applyRootMotion = false;                                                                                  //当attackStates = AttackStates.Idle;就代表结束了一次攻击
         isAttacking = false;
+        if(enemy.IsInState(EnemyStates.Attack))//当敌人处于死亡状态时就不能执行后撤的动作
         enemy.ChangeState(EnemyStates.RetreatAfterAttack);
     }
     public override void Exit()

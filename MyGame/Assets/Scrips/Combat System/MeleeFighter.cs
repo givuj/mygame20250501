@@ -32,6 +32,7 @@ public class MeleeFighter : MonoBehaviour
     }
     public AttackStates attackStates { get; private set; } 
     public bool inAction { get; private set; } = false;
+    public bool inCounter { get;  set; } = false;
     bool doComb;
     
     public void TryToAttack()
@@ -54,7 +55,7 @@ public class MeleeFighter : MonoBehaviour
     IEnumerator Attack()//协程
     {
 
-        Debug.Log(doCombCount);
+       
         inAction = true;// 标记攻击开始
         attackStates = AttackStates.Windup;
         //float impactStartTime = 0.33f;//选择攻击动画中造成伤害的时间点（就是挥出去那一段造成伤害时间段记下来）
@@ -73,6 +74,7 @@ public class MeleeFighter : MonoBehaviour
             float normalizedTime = timer / animState.length;//统一化
             if (attackStates == AttackStates.Windup)
             {
+                if (inCounter) break;//玩家要反击时敌人不能在连击了
                 if (normalizedTime >= attacks[doCombCount].ImpactStartime)
                 {
                     attackStates = AttackStates.Inpact;
@@ -153,4 +155,37 @@ public class MeleeFighter : MonoBehaviour
         inAction = false;
 
     }
+
+    public IEnumerator PerformCounterAttack(EnemyController opponent)
+    {
+        inAction = true;
+        inCounter = true;
+        opponent.Fighter.inCounter = true;
+        opponent.ChangeState(EnemyStates.Dead);
+
+        //反击时让玩家对着敌人，敌人对着玩家
+        var dispVec = opponent.transform.position - transform.position;
+        dispVec.y = 0f;
+        transform.rotation = Quaternion.LookRotation(dispVec);
+        opponent.transform.rotation = Quaternion.LookRotation(-dispVec);
+
+        animator.CrossFade("CounterAttack", 0.2f);
+        opponent.Animator.CrossFade("CounterAttackVictim",0.2f);
+        yield return null;
+
+        var targetPos = opponent.transform.position - dispVec.normalized * 1f;
+        var animState = animator.GetNextAnimatorStateInfo(1);
+        float timer = 0f;
+        while(timer<=animState.length)
+        {
+            transform.position = Vector3.MoveTowards(transform.position,targetPos,5*Time.deltaTime);
+            yield return null;
+            timer += Time.deltaTime;
+        }
+        inCounter = false;
+        opponent.Fighter.inCounter = false;
+        inAction = false;
+
+    }
+    public bool IsCounterable => attackStates == AttackStates.Windup && doCombCount == 0;//什么时候可以反击
 }
