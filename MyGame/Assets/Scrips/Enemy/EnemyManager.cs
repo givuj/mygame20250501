@@ -38,15 +38,18 @@ public class EnemyManager : MonoBehaviour
             if(notAttackingTimer<=0)//满足条件敌人开始攻击
             {
                 var attackingEnemy = SelectEnemyForAttack();//随机选取一个敌人
-                attackingEnemy.ChangeState(EnemyStates.Attack);
-                notAttackingTimer = Random.Range(timeNum.x, timeNum.y);
+                if (attackingEnemy != null)
+                {
+                    attackingEnemy.ChangeState(EnemyStates.Attack);
+                    notAttackingTimer = Random.Range(timeNum.x, timeNum.y);
+                }
             }
         }
 
     }
     EnemyController SelectEnemyForAttack()
     {
-        return enemiesInRange.OrderByDescending(e=>e.CombatMovementTimer).FirstOrDefault();
+        return enemiesInRange.OrderByDescending(e=>e.CombatMovementTimer).FirstOrDefault(e=>e.Target!=null);
     }
     public EnemyController GetAttackingEnemy()
     {
