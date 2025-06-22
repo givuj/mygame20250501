@@ -51,7 +51,16 @@ public class EnemyManager : MonoBehaviour
         {
            
             timer = 0f;
-            player.targetEnemy = GetClosesEnemyToPlayerDir();
+            
+            var closetEnemy = GetClosesEnemyToPlayerDir();
+            if(closetEnemy!=null&&closetEnemy!=player.targetEnemy)//改变敌人颜色当被瞄准时，之前敌人还原，离得近的敌人锁定
+            {
+                var prevEnemy = player.targetEnemy;
+                player.targetEnemy = closetEnemy;
+                player?.targetEnemy?.MeshHighlighter.HighlightMesh(true);
+                prevEnemy?.MeshHighlighter?.HighlightMesh(false);
+            }
+
         }
         timer += Time.deltaTime ;
 

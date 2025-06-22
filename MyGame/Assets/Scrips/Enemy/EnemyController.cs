@@ -14,11 +14,13 @@ public class EnemyController : MonoBehaviour
     public float CombatMovementTimer { get; set; } = 0f;
     public Animator Animator { get; private set; }
     public MeleeFighter Fighter { get; private set; }
+    public SkinneMesh MeshHighlighter { get; private set; }
     public VisionSensor visionSensor { get;  set; }
 
     Dictionary<EnemyStates, State<EnemyController>> stateDict;
     private void Start()
     {
+        MeshHighlighter = GetComponent<SkinneMesh>();
         NavAgent = GetComponent<NavMeshAgent>();
         CharacterController = GetComponent<CharacterController>();
         stateDict = new Dictionary<EnemyStates, State<EnemyController>>();

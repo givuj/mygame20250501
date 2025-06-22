@@ -2366,6 +2366,7 @@ GameObject:
   - component: {fileID: 5125435110058360957}
   - component: {fileID: 8628615473815226670}
   - component: {fileID: 1149630285639547752}
+  - component: {fileID: 4963101937039695684}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -2561,6 +2562,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b65572abbda583f47af8acac9c07a147, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4963101937039695684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7853574485331006001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31feecbb0e347fe4cb18b9fc11025145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshesToHiglight:
+  - {fileID: 1536535620162052435}
+  - {fileID: 1379112198132837487}
+  originalMaterial: {fileID: 1106563633393636324, guid: 5e51335df9547ac41ace74b96f863e31,
+    type: 3}
+  highligtedMaterial: {fileID: 2100000, guid: 2cc8ab46b309ded49b6f380f98d805a4, type: 2}
 --- !u!1 &8035910679074615114
 GameObject:
   m_ObjectHideFlags: 0
@@ -3481,11 +3500,23 @@ PrefabInstance:
       propertyPath: m_Bones.Array.data[68]
       value: 
       objectReference: {fileID: 9149868234153077436}
+    - target: {fileID: 8039868259224922552, guid: c6c49de7eb337aa44978f0917a6ec6ac,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 1106563633393636324, guid: 5e51335df9547ac41ace74b96f863e31,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c6c49de7eb337aa44978f0917a6ec6ac, type: 3}
+--- !u!137 &1379112198132837487 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8039868259224922552, guid: c6c49de7eb337aa44978f0917a6ec6ac,
+    type: 3}
+  m_PrefabInstance: {fileID: 8984908483779855831}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9078312834261792633 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 93568186340651694, guid: c6c49de7eb337aa44978f0917a6ec6ac,
