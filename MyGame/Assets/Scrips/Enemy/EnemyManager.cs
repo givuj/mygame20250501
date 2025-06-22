@@ -6,7 +6,8 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
     [SerializeField] Vector2 timeNum = new Vector2(1,4);
-    public static EnemyManager i { get; private set; }//设为公共别的地方也能用到i
+    [SerializeField] CombatController player ;
+    public static EnemyManager i { get;private set; }//设为公共别的地方也能用到i
     private void Awake()
     {
         i = this;
@@ -21,6 +22,7 @@ public class EnemyManager : MonoBehaviour
             enemiesInRange.Add(enemy);
         }
     }
+    float timer = 0f;
     public void RemoveEnemyInRange(EnemyController enemy)
     {
           enemiesInRange.Remove(enemy);
@@ -45,6 +47,13 @@ public class EnemyManager : MonoBehaviour
                 }
             }
         }
+        if(timer>0.1f)
+        {
+           
+            timer = 0f;
+            player.targetEnemy = GetClosesEnemyToPlayerDir();
+        }
+        timer += Time.deltaTime ;
 
     }
     EnemyController SelectEnemyForAttack()
@@ -55,4 +64,27 @@ public class EnemyManager : MonoBehaviour
     {
         return enemiesInRange.FirstOrDefault(e=>e.IsInState(EnemyStates.Attack));
     }
+    public EnemyController GetClosesEnemyToPlayerDir()//获取最近的敌人
+    {
+       
+        var targetingDir = player.GetTargetingDir();
+        
+        float minDistance = Mathf.Infinity;
+        EnemyController closestEnemy = null;
+        foreach(var enemy in enemiesInRange)
+        {
+            var vecToEnemy = enemy.transform.position - player.transform.position;
+            vecToEnemy.y = 0;
+            float angle = Vector3.Angle(targetingDir,vecToEnemy);
+            float distance = vecToEnemy.magnitude * Mathf.Sin(angle*Mathf.Deg2Rad);//sin度数
+            if(distance<minDistance)
+            {
+                minDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+       
+        return closestEnemy;
+    }
+
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CombatController : MonoBehaviour
 {
-    public EnemyController targetEnemy//锁定视角的敌人
+    public EnemyController targetEnemy;//锁定视角的最近的敌人
     MeleeFighter meleeFight;
     Animator animator;
     CameraController cam;
@@ -43,6 +43,7 @@ public class CombatController : MonoBehaviour
     }
     public Vector3 GetTargetingDir()//获得相机和人物之间的向量反向，以便找离得最近的敌人锁定视角
     {
+       
         var vecFromCam = transform.position - cam.transform.position;
         vecFromCam.y = 0f;
         return vecFromCam.normalized;
