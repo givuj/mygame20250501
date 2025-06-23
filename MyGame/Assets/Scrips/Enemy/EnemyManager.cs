@@ -7,8 +7,7 @@ public class EnemyManager : MonoBehaviour
 {
     [SerializeField] Vector2 timeNum = new Vector2(1, 4);
     [SerializeField] CombatController player;
-    [SerializeField] float distanceToEnemy = 3f;//如果敌人和人物距离超过3m就无法锁定
-
+    [SerializeField] float lockOnDistance = 3f;
     private bool isLocked = false; // 标记是否已经锁定了敌人
     public static EnemyManager i { get; private set; }//设为公共别的地方也能用到i
     private void Awake()
@@ -33,13 +32,24 @@ public class EnemyManager : MonoBehaviour
         if (enemy == player.targetEnemy)
         {
             enemy.MeshHighlighter?.HighlightMesh(false);
-            player.targetEnemy = GetClosesEnemyToPlayerDir();
-            player.targetEnemy?.MeshHighlighter?.HighlightMesh(true);
+            if (isLocked) // 锁定模式：清空目标但不切换,player.IsPutMouse2 = !player.IsPutMouse2;关键一步
+            {
+                player.targetEnemy = null;
+                lockedEnemy = null;
+                isLocked = false;
+                player.IsPutMouse2 = !player.IsPutMouse2;
+            }
+            else // 非锁定模式：正常切换到最近敌人
+            {
+                player.targetEnemy = GetClosesEnemyToPlayerDir();
+                player.targetEnemy?.MeshHighlighter?.HighlightMesh(true);
+            }
 
         }
     }
     private void Update()//敌人攻击主角的主入口，以及将敌人变为攻击状态
     {
+        
         if (enemiesInRange.Count == 0) return;
         if (!enemiesInRange.Any(e => e.IsInState(EnemyStates.Attack)))//2. .Any(...)方法：Enumerable.Any 扩展方法 作用：判断集合中 是否至少有一个元素满足指定条件，返回 bool。
         {                                                          //3.e => e.IsInState(EnemyStates.Attack) 含义：对每个敌人 e，调用其 IsInState 方法，检查是否处于 EnemyStates.Attack 状态。
@@ -67,43 +77,27 @@ public class EnemyManager : MonoBehaviour
                 if (!isLocked)
                 {
                     lockedEnemy = GetClosesEnemyToPlayerDir();
-                    if (lockedEnemy != null)
+                    if (lockedEnemy != null && Vector3.Distance(player.transform.position, lockedEnemy.transform.position) <= lockOnDistance)
                     {
-
                         player.targetEnemy = lockedEnemy;
                         lockedEnemy.MeshHighlighter.HighlightMesh(true);
                         isLocked = true;
-
                     }
                 }
             }
             else
             {
-                // 如果玩家松开鼠标中键，取消锁定
-                if (lockedEnemy != null)
-                {
-                    lockedEnemy.MeshHighlighter.HighlightMesh(false);
-                    lockedEnemy = null;
-                    player.targetEnemy = null;
+                   // 如果玩家松开鼠标中键，取消锁定
+               
                     isLocked = false;
-                }
+                
             }
         }
 
         timer += Time.deltaTime;
 
     }
-    private void UpdateTargetEnemy(EnemyController newEnemy)
-    {
-        if (player.targetEnemy != null && player.targetEnemy != newEnemy)
-        {
-            player.targetEnemy.MeshHighlighter.HighlightMesh(false);
-        }
-
-        // 设置新的目标敌人并高亮
-        player.targetEnemy = newEnemy;
-        newEnemy.MeshHighlighter.HighlightMesh(true);
-    }
+   
 
     EnemyController SelectEnemyForAttack()
     {

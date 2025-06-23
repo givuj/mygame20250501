@@ -5,10 +5,12 @@ using UnityEngine;
 public class CombatController : MonoBehaviour
 {
     public EnemyController targetEnemy;//锁定视角的最近的敌人
+   
     MeleeFighter meleeFight;
     Animator animator;
     CameraController cam;
-
+    [SerializeField] float lockOnDistance = 3f;
+    
     public bool IsPutMouse2 { get; set; } = false;
     // Start is called before the first frame update
     void Start()
@@ -36,17 +38,30 @@ public class CombatController : MonoBehaviour
         }
         if (Input.GetButtonDown("LockOn"))//锁定敌人视角
         {
-            IsPutMouse2 = (!IsPutMouse2);//最开始变成ture
-            if (!IsPutMouse2)
+            if (IsEnemyInLockOnDistance())
             {
-                targetEnemy?.MeshHighlighter?.HighlightMesh(false);
-                targetEnemy = null;
+                IsPutMouse2 = (!IsPutMouse2); // 开始锁定ture
+                if (!IsPutMouse2)
+                {
+                    targetEnemy?.MeshHighlighter?.HighlightMesh(false);
+                    targetEnemy = null;
+                }
             }
 
         }
 
 
 
+    }
+    private bool IsEnemyInLockOnDistance()//设立最小距离锁定距离
+    {
+        var closestEnemy = EnemyManager.i.GetClosesEnemyToPlayerDir();
+        if (closestEnemy != null)
+        {
+            float distance = Vector3.Distance(transform.position, closestEnemy.transform.position);
+            return distance <= lockOnDistance;
+        }
+        return false;
     }
 
     private void OnAnimatorMove()//手动启动根运动，目的让玩家反击时不改变位置

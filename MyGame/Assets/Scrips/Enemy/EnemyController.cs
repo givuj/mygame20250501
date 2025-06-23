@@ -69,7 +69,7 @@ public class EnemyController : MonoBehaviour
         Animator.SetFloat("strafeSpeed", strafeSpeed, 0.2f,Time.deltaTime);
         
         prevPos = transform.position;
-     
+        Debug.Log("forwardSpeed="+ forwardSpeed+ "strafeSpeed= "+ strafeSpeed);
         
     }
 }
