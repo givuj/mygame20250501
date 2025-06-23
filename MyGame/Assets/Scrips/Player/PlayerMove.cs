@@ -14,6 +14,7 @@ public class PlayMove : MonoBehaviour
     [SerializeField] float groundCheckRadius = 0.2f;
     [SerializeField] Vector3 groundCheckOffset;
     [SerializeField] LayerMask groundLayer;
+     CombatController player;//找到锁定的敌人
     bool isGrounded;
     //y方向的重力
     float ySpeed;
@@ -25,18 +26,14 @@ public class PlayMove : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         meleeFighter = GetComponent<MeleeFighter>();
+        player = GetComponent<CombatController>();
     }
 
    
-    void Update()
+    void Update()//人物的跑和重力
     {
        
-        if (meleeFighter.inAction)//确保我们按下攻击键不会移动
-        {
-            targetRotation = transform.rotation;//反击后玩家的视角不会再转动
-            animator.SetFloat("forwardSpeed", 0f);//确保攻击停止时不会是跑或者走的状态   
-            return; 
-        }
+        
         // 使用原始输入，立即获取0值
         float h = Input.GetAxisRaw("Horizontal");//当不输入wsad是h会以及减成0，这样可以防止停止移动时的滑行
         float v = Input.GetAxisRaw("Vertical");//当不输入wsad是v会以及减成0
@@ -56,15 +53,34 @@ public class PlayMove : MonoBehaviour
         {
             ySpeed += Physics.gravity.y * Time.deltaTime;
         }
+        if (meleeFighter.inAction)//确保我们按下攻击键不会移动
+        {
+            targetRotation = transform.rotation; //反击后玩家的视角不会再转动
+            animator.SetFloat("forwardSpeed", 0f); //确保攻击停止时不会是跑或者走的状态   
+            var velocity1 = new Vector3(0, ySpeed, 0);
+            characterController.Move(velocity1 * Time.deltaTime); // 仅应用重力
+            return;
+        }
         var velocity = moveDir * movespeed;
         velocity.y = ySpeed;
         characterController.Move(velocity * Time.deltaTime);//有重力有碰撞人物在空中移动的距离
-        if (moveAmount > 0)//当视角移动量大于0时人物才能移动
+        if (player != null&& player.targetEnemy != null) // 检查是否有锁定的敌人,有就面向锁定的敌人
         {
-            targetRotation = Quaternion.LookRotation(moveDir);
-            //transform.position += moveDir * movespeed * Time.deltaTime;//没物理世界人物移动的距离
-           
+            Debug.Log("不为空");
+            var vecToEnemy = player.targetEnemy.transform.position - transform.position;
+            vecToEnemy.y = 0f; // 忽略 Y 轴的影响
+            targetRotation = Quaternion.LookRotation(vecToEnemy);
         }
+        else
+        {
+            if (moveAmount > 0)//当视角移动量大于0时人物才能移动
+            {
+                targetRotation = Quaternion.LookRotation(moveDir);
+                //transform.position += moveDir * movespeed * Time.deltaTime;//没物理世界人物移动的距离
+
+            }
+        }
+        
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);//人物移动的方向
         animator.SetFloat("forwardSpeed", moveAmount, 0.2f, Time.deltaTime);//播放走和跑的动画，并且是逐步的播放

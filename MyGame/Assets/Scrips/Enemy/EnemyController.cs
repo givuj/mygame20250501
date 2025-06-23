@@ -35,7 +35,7 @@ public class EnemyController : MonoBehaviour
         stateMachine.ChangeState(stateDict[EnemyStates.Idle]);//通过状态机核心改变敌人状态为Idle状态
         Animator = GetComponent<Animator>();
         Fighter = GetComponent<MeleeFighter>();
-
+        prevPos = transform.position;
 
     }
     public bool IsInState(EnemyStates state)
@@ -69,7 +69,7 @@ public class EnemyController : MonoBehaviour
         Animator.SetFloat("strafeSpeed", strafeSpeed, 0.2f,Time.deltaTime);
         
         prevPos = transform.position;
-        Debug.Log("forwardSpeed="+ forwardSpeed+ "strafeSpeed= "+ strafeSpeed);
+        Debug.Log(prevPos);
         
     }
 }
