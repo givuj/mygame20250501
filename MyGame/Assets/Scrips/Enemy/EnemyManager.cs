@@ -5,9 +5,12 @@ using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
 {
-    [SerializeField] Vector2 timeNum = new Vector2(1,4);
-    [SerializeField] CombatController player ;
-    public static EnemyManager i { get;private set; }//设为公共别的地方也能用到i
+    [SerializeField] Vector2 timeNum = new Vector2(1, 4);
+    [SerializeField] CombatController player;
+    [SerializeField] float distanceToEnemy = 3f;//如果敌人和人物距离超过3m就无法锁定
+
+    private bool isLocked = false; // 标记是否已经锁定了敌人
+    public static EnemyManager i { get; private set; }//设为公共别的地方也能用到i
     private void Awake()
     {
         i = this;
@@ -15,9 +18,10 @@ public class EnemyManager : MonoBehaviour
     // Start is called before the first frame update
     public List<EnemyController> enemiesInRange = new List<EnemyController>();
     float notAttackingTimer = 2;   //若将其修改为 float notAttackingTimer = 0;，当没有敌人正在攻击时，由于 notAttackingTimer 初始值为 0，在 Update 方法里，if(notAttackingTimer<=0) 这个条件会立即满足，这会导致敌人会马上选择一个敌人发起攻击，而不会有任何等待时间。并且之后每次攻击结束后，虽然 notAttackingTimer 仍会被重置为 timeNum 所定义的随机值，但下次没有敌人攻击时又会立刻发起新的攻击。
+    private EnemyController lockedEnemy = null;//已经锁定的敌人
     public void AddEnemyInRange(EnemyController enemy)
     {
-        if(!enemiesInRange.Contains(enemy))
+        if (!enemiesInRange.Contains(enemy))
         {
             enemiesInRange.Add(enemy);
         }
@@ -25,8 +29,14 @@ public class EnemyManager : MonoBehaviour
     float timer = 0f;
     public void RemoveEnemyInRange(EnemyController enemy)
     {
-          enemiesInRange.Remove(enemy);
-        
+        enemiesInRange.Remove(enemy);
+        if (enemy == player.targetEnemy)
+        {
+            enemy.MeshHighlighter?.HighlightMesh(false);
+            player.targetEnemy = GetClosesEnemyToPlayerDir();
+            player.targetEnemy?.MeshHighlighter?.HighlightMesh(true);
+
+        }
     }
     private void Update()//敌人攻击主角的主入口，以及将敌人变为攻击状态
     {
@@ -37,7 +47,7 @@ public class EnemyManager : MonoBehaviour
             {
                 notAttackingTimer -= Time.deltaTime;
             }
-            if(notAttackingTimer<=0)//满足条件敌人开始攻击
+            if (notAttackingTimer <= 0)//满足条件敌人开始攻击
             {
                 var attackingEnemy = SelectEnemyForAttack();//随机选取一个敌人
                 if (attackingEnemy != null)
@@ -47,52 +57,82 @@ public class EnemyManager : MonoBehaviour
                 }
             }
         }
-        if(timer>0.1f)
+        if (timer > 0.01f)
         {
-           
-            timer = 0f;
-            
-            var closetEnemy = GetClosesEnemyToPlayerDir();
-            if(closetEnemy!=null&&closetEnemy!=player.targetEnemy)//改变敌人颜色当被瞄准时，之前敌人还原，离得近的敌人锁定
-            {
-                var prevEnemy = player.targetEnemy;
-                player.targetEnemy = closetEnemy;
-                player?.targetEnemy?.MeshHighlighter.HighlightMesh(true);
-                prevEnemy?.MeshHighlighter?.HighlightMesh(false);
-            }
 
+            timer = 0f;
+            if (player.IsPutMouse2)
+            {
+                // 如果玩家按下鼠标中键，且没有锁定敌人，则锁定最近的敌人
+                if (!isLocked)
+                {
+                    lockedEnemy = GetClosesEnemyToPlayerDir();
+                    if (lockedEnemy != null)
+                    {
+
+                        player.targetEnemy = lockedEnemy;
+                        lockedEnemy.MeshHighlighter.HighlightMesh(true);
+                        isLocked = true;
+
+                    }
+                }
+            }
+            else
+            {
+                // 如果玩家松开鼠标中键，取消锁定
+                if (lockedEnemy != null)
+                {
+                    lockedEnemy.MeshHighlighter.HighlightMesh(false);
+                    lockedEnemy = null;
+                    player.targetEnemy = null;
+                    isLocked = false;
+                }
+            }
         }
-        timer += Time.deltaTime ;
+
+        timer += Time.deltaTime;
 
     }
+    private void UpdateTargetEnemy(EnemyController newEnemy)
+    {
+        if (player.targetEnemy != null && player.targetEnemy != newEnemy)
+        {
+            player.targetEnemy.MeshHighlighter.HighlightMesh(false);
+        }
+
+        // 设置新的目标敌人并高亮
+        player.targetEnemy = newEnemy;
+        newEnemy.MeshHighlighter.HighlightMesh(true);
+    }
+
     EnemyController SelectEnemyForAttack()
     {
-        return enemiesInRange.OrderByDescending(e=>e.CombatMovementTimer).FirstOrDefault(e=>e.Target!=null);
+        return enemiesInRange.OrderByDescending(e => e.CombatMovementTimer).FirstOrDefault(e => e.Target != null);
     }
     public EnemyController GetAttackingEnemy()
     {
-        return enemiesInRange.FirstOrDefault(e=>e.IsInState(EnemyStates.Attack));
+        return enemiesInRange.FirstOrDefault(e => e.IsInState(EnemyStates.Attack));
     }
     public EnemyController GetClosesEnemyToPlayerDir()//获取最近的敌人
     {
-       
+
         var targetingDir = player.GetTargetingDir();
-        
+
         float minDistance = Mathf.Infinity;
         EnemyController closestEnemy = null;
-        foreach(var enemy in enemiesInRange)
+        foreach (var enemy in enemiesInRange)
         {
             var vecToEnemy = enemy.transform.position - player.transform.position;
             vecToEnemy.y = 0;
-            float angle = Vector3.Angle(targetingDir,vecToEnemy);
-            float distance = vecToEnemy.magnitude * Mathf.Sin(angle*Mathf.Deg2Rad);//sin度数
-            if(distance<minDistance)
+            float angle = Vector3.Angle(targetingDir, vecToEnemy);
+            float distance = vecToEnemy.magnitude * Mathf.Sin(angle * Mathf.Deg2Rad);//sin度数
+            if (distance < minDistance)
             {
                 minDistance = distance;
                 closestEnemy = enemy;
             }
         }
-       
+
         return closestEnemy;
     }
 
