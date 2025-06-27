@@ -53,7 +53,7 @@ public class EnemyController : MonoBehaviour
         stateMachine.ChangeState(stateDict[states]);
     }
     Vector3 prevPos;
-    private void Update()//人物移动和敌人追逐的主入口，以及人物攻击Execute的入口
+    private void Update()//敌人追逐和移动的主入口，以及人物攻击Execute的入口
     {
         stateMachine.Execute();
         var deltaPos = Animator.applyRootMotion?Vector3.zero: transform.position - prevPos;

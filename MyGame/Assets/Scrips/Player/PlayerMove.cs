@@ -66,13 +66,17 @@ public class PlayMove : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);//有重力有碰撞人物在空中移动的距离
         if (player != null&& player.targetEnemy != null) // 检查是否有锁定的敌人,有就面向锁定的敌人
         {
-            Debug.Log("不为空");
+            
             var vecToEnemy = player.targetEnemy.transform.position - transform.position;
             vecToEnemy.y = 0f; // 忽略 Y 轴的影响
             targetRotation = Quaternion.LookRotation(vecToEnemy);
+            animator.SetBool("combatState",true);//锁定状态下的人物移动
+            
         }
         else
         {
+            animator.SetBool("combatState", false);
+            Debug.Log("false");
             if (moveAmount > 0)//当视角移动量大于0时人物才能移动
             {
                 targetRotation = Quaternion.LookRotation(moveDir);
